@@ -7,7 +7,7 @@
 		"creationDate": "Tue, 07 Jan 2025 01:48:05 GMT",
 		"language": "python",
 		"python": {
-			"main": "\\src\\main.py"
+			"main": "main.py"
 		},
 		"sdkVersion": "V5_1_0_1_25"
 	},

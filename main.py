@@ -1,5 +1,5 @@
 ###############################
-## AUTONOMUS AROUND LINE 137 ##
+## AUTONOMUS AROUND LINE 140 ##
 ###############################
 
 #region VEXcode Generated Robot Configuration
@@ -135,6 +135,7 @@ def autonomous_old():
     # turn_degrees(-90,True)
 
 def autonomous():
+    fingercallback(False)
     move_forward(-36,True)
     fingercallback()
     Chain.set_velocity(100,PERCENT)
@@ -145,8 +146,9 @@ def autonomous():
     Chain.stop()
     fingercallback()
     move_forward(20, True)
-    turn_degrees(-90, True)
+    turn_degrees(-75, True)
     move_forward(-30,True)
+    fingercallback()
 
 def deadzonify(inputvalue):
     # Make the input zero if the absolute value
@@ -159,22 +161,40 @@ def deadzonify(inputvalue):
         return 0
     # Otherwise, don't change it.
     return inputvalue
-
-def fingercallback():
+def configuration_menu():
+    controller_1.screen.clear_screen()
+    controller_1.screen.set_cursor(0,0)
+    controller_1.screen.print("Cyclone robot config")
+    Finger.spin(FORWARD)
+    while 1:
+        speed=deadzonify(controller_1.axis3.position())
+        if controller_1.buttonL1.pressing():
+            speed=speed/10
+        if controller_1.buttonR1.pressing():
+            speed=speed*10
+        Finger.set_velocity(speed,PERCENT)
+        controller_1.screen.set_cursor(1,0)
+        controller_1.screen.clear_line(1)
+        controller_1.screen.print("Motor position: "+str(Finger.position(TURNS)))
+        wait(5,MSEC)
+if controller_1.buttonL2.pressing() and controller_1.buttonR2.pressing():
+    configuration_menu()
+def fingercallback(wait=True):
     global isfingerdown
     isfingerdown=not isfingerdown
     Finger.set_velocity(100, PERCENT)
     if isfingerdown:
-        Finger.spin_to_position(0, TURNS,wait=True)
+        Finger.spin_to_position(0, TURNS,wait=wait)
         ## Finger.set_velocity(0.0001,PERCENT)
         ## Finger.spin(FORWARD)
     else:
         Finger.stop()
-        Finger.spin_to_position(-0.2,TURNS,wait=True)
+        Finger.spin_to_position(-1.6,TURNS,wait=wait)
+fingercallback()
 fingercallback()
 
-autonomous()
 #COCKROACH WAS HERE
+
 
 def when_started():
     # Clear the screen and tell the user
