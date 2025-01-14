@@ -134,10 +134,13 @@ def autonomous_old():
     wait(10, SECONDS)
     # turn_degrees(-90,True)
 
+# If it ain't broke, don't fix it.
 def autonomous():
+    brain.screen.print("Auto running")
     fingercallback(False)
     move_forward(-36,True)
     fingercallback()
+    move_forward(2)
     Chain.set_velocity(100,PERCENT)
     Chain.spin(REVERSE)
     wait(1, SECONDS)
@@ -146,9 +149,9 @@ def autonomous():
     Chain.stop()
     fingercallback()
     move_forward(20, True)
+    fingercallback()
     turn_degrees(-75, True)
     move_forward(-30,True)
-    fingercallback()
 
 def deadzonify(inputvalue):
     # Make the input zero if the absolute value
