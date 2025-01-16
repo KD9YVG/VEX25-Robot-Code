@@ -4,7 +4,10 @@
 
 #region VEXcode Generated Robot Configuration
 from vex import *
+
+# commentformat off
 import urandom # type: ignore
+# commentformat on
 
 # Brain should be defined by default
 brain=Brain()
@@ -27,8 +30,8 @@ def initializeRandomSeed():
     wait(100, MSEC)
     random = brain.battery.voltage(MV) + brain.battery.current(CurrentUnits.AMP) * 100 + brain.timer.system_high_res()
     urandom.seed(int(random))
-      
-# Set random seed 
+
+# Set random seed
 initializeRandomSeed()
 
 
@@ -211,11 +214,11 @@ def when_started():
     AXIS_TURN_LEFT_AND_RIGHT.changed(setaxis)
     # I really should make buttonB a constant, like BUTTON_TIMER
     # or something. And make the callbacks "timerpressed" instead
-    # of "Apressed"
-    controller_1.buttonB.released(Areleased)
-    controller_1.buttonB.pressed(Apressed)
+    # of "timerpressed"
+    controller_1.buttonB.released(timerreleased)
+    controller_1.buttonB.pressed(timerpressed)
     # Make the chain and string go the speed we've defined
-    Chain.set_velocity(NUMBER_CHAIN_SPEED*100,PERCENT) 
+    Chain.set_velocity(NUMBER_CHAIN_SPEED*100,PERCENT)
     String.set_velocity(NUMBER_STRING_SPEED*100,PERCENT)
     # Set left motor and right motor to zero, because of the note below.
     Left.set_velocity(0,PERCENT)
@@ -236,55 +239,74 @@ def when_started():
             String.spin_to_position(NUMBER_STRING_HARDSTOP+4,DEGREES,wait=False)
             print("Hardstop triggered")
 
-        if isgoing: # While the timer is running, display the timer value on the screen.
+        # While the timer is running, display the timer value on the screen.
+        if isgoing:
             controller_1.screen.clear_row(1)
             controller_1.screen.set_cursor(2,1)
             controller_1.screen.print(brain.timer.time(SECONDS))
-        wait(15,MSEC) # Make sure the event loop doesn't get bogged down.
+        # Make sure the event loop doesn't get bogged down.
+        wait(15,MSEC)
 
-def setaxis(): # Callback when any axis is changed
-    drive_speed_multiplier=(NUMBER_OVERALL_SPEED*NUMBER_DRIVE_SPEED) # includes drive multiplier AND overall mult
-    axis_position=deadzonify(AXIS_DRIVE_FORWARD_AND_BACKWARD.position()) # Position of the axis, taking deadzone into account
-    updownpos=drive_speed_multiplier*(0-axis_position) # Make the axis inverted, to fix an inverted driving issue we had
+# Callback when any axis is changed
+def setaxis():
+    # includes drive multiplier AND overall mult
+    drive_speed_multiplier=(NUMBER_OVERALL_SPEED*NUMBER_DRIVE_SPEED)
+    # Position of the axis, taking deadzone into account
+    axis_position=deadzonify(AXIS_DRIVE_FORWARD_AND_BACKWARD.position())
+    # Make the axis inverted, to fix an inverted driving issue we had
+    updownpos=drive_speed_multiplier*(0-axis_position)
 
-    turn_speed_multiplier=(NUMBER_OVERALL_SPEED*NUMBER_TURN_SPEED) # includes turn multiplier AND overall mult
-    axis_position=deadzonify(AXIS_TURN_LEFT_AND_RIGHT.position()) # Position of the axis, taking deadzone into account
-    leftrightpos=turn_speed_multiplier*axis_position               # Do the final computations, as above.
+    # Includes turn multiplier AND overall mult
+    turn_speed_multiplier=(NUMBER_OVERALL_SPEED*NUMBER_TURN_SPEED)
+    # Position of the axis, taking deadzone into account
+    axis_position=deadzonify(AXIS_TURN_LEFT_AND_RIGHT.position())
+    # Do the final computations, as above.
+    leftrightpos=turn_speed_multiplier*axis_position
 
-    Left.set_velocity(updownpos+leftrightpos,PERCENT)              # Make the motors actually do the positions.
+    # Make the motors carry out the rotation amounts we defined
+    Left.set_velocity(updownpos+leftrightpos,PERCENT)
     Right.set_velocity(updownpos-leftrightpos,PERCENT)
 
-justchangedisgoing=False # Make sure the timer isn't started on press, and stopped on the same release.
+# Make sure the timer isn't started on press,
+# and then stopped on the same release.
+justchangedisgoing=False
 
-def Apressed(): # Callback when timer button pressed
+# Callback when timer button pressed
+def timerpressed():
     global isgoing,justchangedisgoing
     if isgoing:
+        # Get ready and show how to time
         isgoing=False
-        justchangedisgoing=True            #Get ready and show how to time
+        justchangedisgoing=True
         controller_1.screen.clear_screen()
         controller_1.screen.set_cursor(2,1)
         controller_1.screen.print(str(brain.timer.time(SECONDS)))
         controller_1.screen.set_cursor(1,1)
         controller_1.screen.print("Hold B for timer")
     else:
-        controller_1.screen.clear_screen()    # Display message showing how to start
+        # Display message showing how to start
+        controller_1.screen.clear_screen()
         controller_1.screen.set_cursor(1,1)
         controller_1.screen.print("Let go of B to start!")
 
-def Areleased(): # Callback when timer button released
+# Callback when timer button released
+def timerreleased():
     global isgoing,justchangedisgoing
     if not isgoing:
         if justchangedisgoing:
             justchangedisgoing=False
         else:
-            brain.timer.clear()                       # Clear timer, and inform user how to stop.
+            # Clear timer, and inform user how to stop.
+            brain.timer.clear()
             controller_1.screen.set_cursor(1,1)
             controller_1.screen.print("Press B to stop")
             isgoing=True
 
-Chain.set_stopping(HOLD)  # Make intake hold its position when stopped
+# Make intake hold its position when stopped
+Chain.set_stopping(HOLD)
 String.set_stopping(HOLD)
 
 wait(15,MSEC)
 
-competition = Competition(when_started, autonomous) # Define the competition for VEX to do whatever with
+# Define the competition object so that the field can find our driver control and autonomous functions
+competition = Competition(when_started, autonomous)
