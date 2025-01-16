@@ -140,7 +140,7 @@ def autonomous():
     fingercallback(False)
     move_forward(-36,True)
     fingercallback()
-    move_forward(2)
+    #move_forward(2)
     Chain.set_velocity(100,PERCENT)
     Chain.spin(REVERSE)
     wait(1, SECONDS)
