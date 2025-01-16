@@ -120,13 +120,7 @@ def move_forward(inches,wait=False):
     Left.set_position(0,TURNS)
     Right.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=False)
     Left.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=wait)
-def fun():
-    Chain.set_velocity(75,PERCENT)
-    Chain.spin(REVERSE)
-    move_forward(80,True)
-    wait(10, SECONDS)
-    Chain.stop()
-#fun()
+
 def autonomous_old():
     Chain.set_velocity(100,PERCENT)
     Chain.spin(REVERSE)
@@ -188,8 +182,6 @@ def fingercallback(wait=True):
     Finger.set_velocity(100, PERCENT)
     if isfingerdown:
         Finger.spin_to_position(0, TURNS,wait=wait)
-        ## Finger.set_velocity(0.0001,PERCENT)
-        ## Finger.spin(FORWARD)
     else:
         Finger.stop()
         Finger.spin_to_position(-1.6,TURNS,wait=wait)
@@ -214,10 +206,6 @@ def when_started():
     BUTTON_STRING_FORWARD.released(String.stop)
     BUTTON_STRING_REVERSE.pressed(lambda: String.spin(REVERSE))
     BUTTON_STRING_REVERSE.released(String.stop)
-    ##BUTTON_FINGER_DOWN.pressed(lambda: Finger.spin(REVERSE))
-    ##BUTTON_FINGER_DOWN.released(Finger.stop)
-    ##BUTTON_FINGER_UP.pressed(lambda: Finger.spin(FORWARD))
-    ##BUTTON_FINGER_UP.released(Finger.stop)
     BUTTON_FINGER.released(fingercallback)
     AXIS_DRIVE_FORWARD_AND_BACKWARD.changed(setaxis)
     AXIS_TURN_LEFT_AND_RIGHT.changed(setaxis)
@@ -243,15 +231,11 @@ def when_started():
     # Finger should brake when not being moved.
     Finger.set_stopping(BRAKE)
     while True:
-        ## print(Finger.position(TURNS))
-        ## print(String.position(DEGREES)) # Debugging to figure out the hardstop for the string
-
         # If the string is below the hardstop, move it there, but, not if left is pressed.
         if String.position(DEGREES)<NUMBER_STRING_HARDSTOP and not controller_1.buttonLeft.pressing():
             String.spin_to_position(NUMBER_STRING_HARDSTOP+4,DEGREES,wait=False)
             print("Hardstop triggered")
 
-        ## print(brain.timer.time(SECONDS)) # Debugging from the old timer
         if isgoing: # While the timer is running, display the timer value on the screen.
             controller_1.screen.clear_row(1)
             controller_1.screen.set_cursor(2,1)
