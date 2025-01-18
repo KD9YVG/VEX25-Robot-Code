@@ -19,7 +19,11 @@ def do(side):
 
 do("l")
 print("Uploading left/slot 1")
-os.system("c:\\Users\\kwate\\.vscode\\extensions\\vexrobotics.vexcode-0.6.1\\resources\\tools\\vexcom\\win32\\vexcom.exe --slot 1 --write main.py COM3 --progress")
+open("Left.py","w").write(open("main.py").read())
+os.system("c:\\Users\\kwate\\.vscode\\extensions\\vexrobotics.vexcode-0.6.1\\resources\\tools\\vexcom\\win32\\vexcom.exe --slot 1 --write Left.py --icon 2 COM3 --progress")
 do("r")
 print("Uploading right/slot 2")
-os.system("c:\\Users\\kwate\\.vscode\\extensions\\vexrobotics.vexcode-0.6.1\\resources\\tools\\vexcom\\win32\\vexcom.exe --slot 2 --write main.py COM3 --progress")
+open("Right.py","w").write(open("main.py").read())
+os.system("c:\\Users\\kwate\\.vscode\\extensions\\vexrobotics.vexcode-0.6.1\\resources\\tools\\vexcom\\win32\\vexcom.exe --slot 2 --write Right.py --icon 2 COM3 --progress")
+os.remove("Left.py")
+os.remove("Right.py")
