@@ -2,6 +2,8 @@
 ## AUTONOMUS AROUND LINE 140 ##
 ###############################
 
+AUTO_SIDE="right"
+
 #region VEXcode Generated Robot Configuration
 from vex import *
 
@@ -140,14 +142,13 @@ def autonomous():
     #move_forward(2)
     Chain.set_velocity(100,PERCENT)
     Chain.spin(REVERSE)
-    wait(1, SECONDS)
+    wait(3, SECONDS)
     Chain.spin(FORWARD)
-    wait(1,SECONDS)
-    Chain.stop()
     fingercallback()
     move_forward(20, True)
     fingercallback()
-    turn_degrees(-75, True)
+    Chain.stop()
+    turn_degrees(75 if AUTO_SIDE=="right" else -75, True)
     move_forward(-30,True)
 
 def deadzonify(inputvalue):
@@ -161,24 +162,6 @@ def deadzonify(inputvalue):
         return 0
     # Otherwise, don't change it.
     return inputvalue
-def configuration_menu():
-    controller_1.screen.clear_screen()
-    controller_1.screen.set_cursor(0,0)
-    controller_1.screen.print("Cyclone robot config")
-    Finger.spin(FORWARD)
-    while 1:
-        speed=deadzonify(controller_1.axis3.position())
-        if controller_1.buttonL1.pressing():
-            speed=speed/10
-        if controller_1.buttonR1.pressing():
-            speed=speed*10
-        Finger.set_velocity(speed,PERCENT)
-        controller_1.screen.set_cursor(1,0)
-        controller_1.screen.clear_line(1)
-        controller_1.screen.print("Motor position: "+str(Finger.position(TURNS)))
-        wait(5,MSEC)
-if controller_1.buttonL2.pressing() and controller_1.buttonR2.pressing():
-    configuration_menu()
 def fingercallback(wait=True):
     global isfingerdown
     isfingerdown=not isfingerdown
@@ -233,13 +216,14 @@ def when_started():
     Right.spin(FORWARD)
     # Finger should brake when not being moved.
     Finger.set_stopping(BRAKE)
-    while True:
+    while competition.is_autonomous() or competition.is_driver_control():
         # If the string is below the hardstop, move it there, but, not if left is pressed.
         if String.position(DEGREES)<NUMBER_STRING_HARDSTOP and not controller_1.buttonLeft.pressing():
             String.spin_to_position(NUMBER_STRING_HARDSTOP+4,DEGREES,wait=False)
             print("Hardstop triggered")
 
-        # While the timer is running, display the timer value on the screen.
+        # While the timer is running,
+        # display the timer value on the screen.
         if isgoing:
             controller_1.screen.clear_row(1)
             controller_1.screen.set_cursor(2,1)
@@ -264,9 +248,12 @@ def setaxis():
     leftrightpos=turn_speed_multiplier*axis_position
 
     # Make the motors carry out the rotation amounts we defined
-    Left.set_velocity(updownpos+leftrightpos,PERCENT)
-    Right.set_velocity(updownpos-leftrightpos,PERCENT)
-
+    if True: #urandom.rand()>0.5:
+        Left.set_velocity(updownpos+leftrightpos,PERCENT)
+        Right.set_velocity(updownpos-leftrightpos,PERCENT)
+    #else:
+    #    Right.set_velocity(updownpos-leftrightpos,PERCENT)
+    #    Left.set_velocity(updownpos+leftrightpos,PERCENT)
 # Make sure the timer isn't started on press,
 # and then stopped on the same release.
 justchangedisgoing=False
@@ -308,5 +295,6 @@ String.set_stopping(HOLD)
 
 wait(15,MSEC)
 
-# Define the competition object so that the field can find our driver control and autonomous functions
+# Define the competition object so that the field
+# can find our driver control and autonomous functions
 competition = Competition(when_started, autonomous)
