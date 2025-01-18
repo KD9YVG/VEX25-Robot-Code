@@ -170,7 +170,7 @@ def fingercallback(wait=True):
         Finger.spin_to_position(0, TURNS,wait=wait)
     else:
         Finger.stop()
-        Finger.spin_to_position(-1.6,TURNS,wait=wait)
+        Finger.spin_to_position(-1.4,TURNS,wait=wait)
 fingercallback()
 fingercallback()
 
