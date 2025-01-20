@@ -51,10 +51,24 @@ class dumbobj:
     def __getattr__(self,name):
         raise NameError("Name "+name+" is not defined.")
 
-#Generated constant map
-CONST=dumbobj(
-           {'JOYSTICK':{'DRIVE':controller_1.axis3,'TURN':controller_1.axis1},'VALUE':{'DEADZONE':10,'SIDE':'right','MULTIPLIER':{'DRIVE':0.85,'TURN':0.4,'CHAIN':1},'FINGER_POSITION':1.4,'SINGLE_DEGREE':1597208273},'BUTTON':{'CHAIN':{'FORWARD':controller_1.buttonL1,'REVERSE':controller_1.buttonL2},'EXTRA':{'BUTTON1':controller_1.buttonR1,'BUTTON2':controller_1.buttonR2},'FINGER':controller_1.buttonX}}
-           )
+JOYSTICK_DRIVE=controller_1.axis3
+JOYSTICK_TURN=controller_1.axis1
+
+VALUE_DEADZONE=10
+VALUE_SIDE="right"
+
+BUTTON_CHAIN_FORWARD=controller_1.buttonL1
+BUTTON_CHAIN_REVERSE=controller_1.buttonL2
+BUTTON_EXTRA_MOTOR1=controller_1.buttonR1
+BUTTON_EXTRA_MOTOR2=controller_1.buttonR2
+BUTTON_FINGER=controller_1.buttonX
+
+VALUE_MULTIPLIER_DRIVE=0.85
+VALUE_MULTIPLIER_TURN=0.4
+VALUE_MULTIPLIER_CHAIN=1
+VALUE_FINGER_POSITION=1.4
+
+VALUE_SINGLE_DEGREE=1597208273
 
 
 
@@ -65,8 +79,8 @@ isfingerdown = True
 def turn_degrees(d,wait=False):
     Right.set_position(0,TURNS)
     Left.set_position(0,TURNS)
-    Right.spin_to_position((CONST.VALUE.SINGLE_DEGREE*d)/200000000000,TURNS,wait=False)
-    Left.spin_to_position(0-(CONST.VALUE.SINGLE_DEGREE*d)/200000000000,TURNS,wait=wait)
+    Right.spin_to_position((VALUE_SINGLE_DEGREE*d)/200000000000,TURNS,wait=False)
+    Left.spin_to_position(0-(VALUE_SINGLE_DEGREE*d)/200000000000,TURNS,wait=wait)
 
 def move_forward(inches,wait=False):
     Right.set_position(0,TURNS)
@@ -96,7 +110,7 @@ def autonomous():
     move_forward(20, True)
     fingercallback()
     Chain.stop()
-    turn_degrees(75 if CONST.VALUE.SIDE=="right" else -75, True)
+    turn_degrees(75 if VALUE_SIDE=="right" else -75, True)
     move_forward(-30,True)
 
 def deadzonify(inputvalue):
@@ -105,7 +119,7 @@ def deadzonify(inputvalue):
 
     # Check the absolute value, so that small
     # NEGATIVE values are also ignored
-    if abs(inputvalue)<CONST.VALUE.DEADZONE:
+    if abs(inputvalue)<VALUE_DEADZONE:
         # If it's less than the deadzone, make it zero.
         return 0
     # Otherwise, don't change it.
@@ -118,7 +132,7 @@ def fingercallback(wait=True):
         Finger.spin_to_position(0, TURNS,wait=wait)
     else:
         Finger.stop()
-        Finger.spin_to_position(-1*CONST.VALUE.FINGER_POSITION,TURNS,wait=wait)
+        Finger.spin_to_position(-1*VALUE_FINGER_POSITION,TURNS,wait=wait)
 fingercallback()
 fingercallback()
 
@@ -147,22 +161,22 @@ def when_started():
     controller_1.screen.set_cursor(1,1)
     controller_1.screen.print("Hold B for timer")
     # Add callbacks for each button and axis
-    CONST.BUTTON.CHAIN.FORWARD.pressed(lambda: Chain.spin(FORWARD))
-    CONST.BUTTON.CHAIN.FORWARD.released(Chain.stop)
-    CONST.BUTTON.CHAIN.REVERSE.pressed(lambda: Chain.spin(REVERSE))
-    CONST.BUTTON.CHAIN.REVERSE.released(Chain.stop)
-    CONST.BUTTON.EXTRA.MOTOR1.released(extramotor1)
-    CONST.BUTTON.EXTRA.MOTOR2.released(extramotor2)
-    CONST.BUTTON.FINGER.released(fingercallback)
-    CONST.JOYSTICK.DRIVE.changed(setaxis)
-    CONST.JOYSTICK.TURN.changed(setaxis)
+    BUTTON_CHAIN_FORWARD.pressed(lambda: Chain.spin(FORWARD))
+    BUTTON_CHAIN_FORWARD.released(Chain.stop)
+    BUTTON_CHAIN_REVERSE.pressed(lambda: Chain.spin(REVERSE))
+    BUTTON_CHAIN_REVERSE.released(Chain.stop)
+    BUTTON_EXTRA_MOTOR1.released(extramotor1)
+    BUTTON_EXTRA_MOTOR2.released(extramotor2)
+    BUTTON_FINGER.released(fingercallback)
+    JOYSTICK_DRIVE.changed(setaxis)
+    JOYSTICK_TURN.changed(setaxis)
     # I really should make buttonB a constant, like BUTTON_TIMER
     # or something. And make the callbacks "timerpressed" instead
     # of "timerpressed"
     controller_1.buttonB.released(timerreleased)
     controller_1.buttonB.pressed(timerpressed)
     # Make the chain and string go the speed we've defined
-    Chain.set_velocity(CONST.VALUE.MULTIPLIER.CHAIN*100,PERCENT)
+    Chain.set_velocity(VALUE_MULTIPLIER_CHAIN*100,PERCENT)
     # Set left motor and right motor to zero, because of the note below.
     Left.set_velocity(0,PERCENT)
     Right.set_velocity(0,PERCENT)
@@ -190,16 +204,16 @@ def when_started():
 # Callback when any axis is changed
 def setaxis():
     # includes drive multiplier AND overall mult
-    drive_speed_multiplier=CONST.VALUE.MULTIPLIER.DRIVE
+    drive_speed_multiplier=VALUE_MULTIPLIER_DRIVE
     # Position of the axis, taking deadzone into account
-    axis_position=deadzonify(CONST.JOYSTICK.TURN.position())
+    axis_position=deadzonify(JOYSTICK_TURN.position())
     # Make the axis inverted, to fix an inverted driving issue we had
     updownpos=drive_speed_multiplier*(0-axis_position)
 
     # Includes turn multiplier AND overall mult
-    turn_speed_multiplier=CONST.VALUE.MULTIPLIER.TURN
+    turn_speed_multiplier=VALUE_MULTIPLIER_TURN
     # Position of the axis, taking deadzone into account
-    axis_position=deadzonify(CONST.JOYSTICK.TURN.position())
+    axis_position=deadzonify(JOYSTICK_TURN.position())
     # Do the final computations, as above.
     leftrightpos=turn_speed_multiplier*axis_position
 
