@@ -1,11 +1,6 @@
-###############################
-## AUTONOMUS AROUND LINE 140 ##
-###############################
-
-AUTO_SIDE="right"
-
-#region VEXcode Generated Robot Configuration
+#region default definitions and config
 from vex import *
+from math import pi
 
 # commentformat off
 import urandom # type: ignore
@@ -19,7 +14,6 @@ controller_1 = Controller(PRIMARY)
 Left = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)
 Right = Motor(Ports.PORT2, GearSetting.RATIO_18_1, True)
 Chain = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)
-String = Motor(Ports.PORT4, GearSetting.RATIO_18_1, False)
 Finger = Motor(Ports.PORT5, GearSetting.RATIO_18_1, False)
 Extra = Motor(Ports.PORT20, GearSetting.RATIO_18_1, False)
 
@@ -49,9 +43,8 @@ wait(200, MSEC)
 # clear the console to make sure we don't have the REPL in the console
 print("\033[2J")
 
-#endregion VEXcode Generated Robot Configuration
+#endregion default definitions and config
 
-from math import pi
 
 # Start constants
 
@@ -75,6 +68,8 @@ BUTTON_CHAIN_FORWARD=controller_1.buttonL1
 BUTTON_CHAIN_REVERSE=controller_1.buttonL2
 BUTTON_EXTRA_MOTOR1=controller_1.buttonR1
 BUTTON_EXTRA_MOTOR2=controller_1.buttonR2
+
+AUTO_SIDE="right"
 
 # Buttons for finger movements
 BUTTON_FINGER=controller_1.buttonX
@@ -216,7 +211,6 @@ def when_started():
     controller_1.buttonB.pressed(timerpressed)
     # Make the chain and string go the speed we've defined
     Chain.set_velocity(NUMBER_CHAIN_SPEED*100,PERCENT)
-    String.set_velocity(NUMBER_STRING_SPEED*100,PERCENT)
     # Set left motor and right motor to zero, because of the note below.
     Left.set_velocity(0,PERCENT)
     Right.set_velocity(0,PERCENT)
@@ -232,11 +226,6 @@ def when_started():
     # Finger should brake when not being moved.
     Finger.set_stopping(BRAKE)
     while competition.is_autonomous() or competition.is_driver_control():
-        # If the string is below the hardstop, move it there, but, not if left is pressed.
-        if String.position(DEGREES)<NUMBER_STRING_HARDSTOP and not controller_1.buttonLeft.pressing():
-            String.spin_to_position(NUMBER_STRING_HARDSTOP+4,DEGREES,wait=False)
-            print("Hardstop triggered")
-
         # While the timer is running,
         # display the timer value on the screen.
         if isgoing:
@@ -306,7 +295,6 @@ def timerreleased():
 
 # Make intake hold its position when stopped
 Chain.set_stopping(HOLD)
-String.set_stopping(HOLD)
 
 wait(15,MSEC)
 
