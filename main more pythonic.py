@@ -1,4 +1,3 @@
-#region default definitions and config
 from vex import *
 from math import pi
 
@@ -6,94 +5,67 @@ from math import pi
 import urandom # type: ignore
 # commentformat on
 
-# Brain should be defined by default
-brain=Brain()
-
-# Robot configuration code
-controller_1 = Controller(PRIMARY)
-Left = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)
-Right = Motor(Ports.PORT2, GearSetting.RATIO_18_1, True)
-Chain = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)
-Finger = Motor(Ports.PORT5, GearSetting.RATIO_18_1, False)
-Extra = Motor(Ports.PORT20, GearSetting.RATIO_18_1, False)
-
-
-# wait for rotation sensor to fully initialize
-wait(30, MSEC)
-
-
-# Make random actually random
-def initializeRandomSeed():
-    wait(100, MSEC)
-    random = brain.battery.voltage(MV) + brain.battery.current(CurrentUnits.AMP) * 100 + brain.timer.system_high_res()
-    urandom.seed(int(random))
-
-# Set random seed
-initializeRandomSeed()
-
-
 def play_vexcode_sound(sound_name):
     # Helper to make playing sounds from the V5 in VEXcode easier and
     # keeps the code cleaner by making it clear what is happening.
     print("VEXPlaySound:" + sound_name)
     wait(5, MSEC)
 
-# add a small delay to make sure we don't print in the middle of the REPL header
-wait(200, MSEC)
-# clear the console to make sure we don't have the REPL in the console
-print("\033[2J")
+class CycloneRobotState:
+    def __init__(self) -> None:
+        self.isTimerRunning=False
+        self.isFingerDown=True
 
-#endregion default definitions and config
+class CycloneRobotCodeApp:
+    def __init__(self) -> None:
+        self.brain=Brain()
+        self.controller_1 = Controller(PRIMARY)
+        self.Left = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)
+        self.Right = Motor(Ports.PORT2, GearSetting.RATIO_18_1, True)
+        self.Chain = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)
+        self.Finger = Motor(Ports.PORT5, GearSetting.RATIO_18_1, False)
+        self.Extra = Motor(Ports.PORT20, GearSetting.RATIO_18_1, False)
+        wait(30, MSEC)
+        self.initializeRandomSeed()
+        # add a small delay to make sure we don't print in the middle of the REPL header
+        wait(200, MSEC)
+        # clear the console to make sure we don't have the REPL in the console
+        print("\033[2J")
+        self.initialize_constants()
+        self.state=CycloneRobotState()
+    def initialize_constants(self):
+        self.JOYSTICK_DRIVE=self.controller_1.axis3
+        self.JOYSTICK_TURN=self.controller_1.axis1
 
-class dumbobj:
-    def __init__(self,d):
-        pass
-    def __getattr__(self,name):
-        raise NameError("Name "+name+" is not defined.")
+        self.VALUE_DEADZONE=10
+        self.VALUE_SIDE="right"
 
-JOYSTICK_DRIVE=controller_1.axis3
-JOYSTICK_TURN=controller_1.axis1
+        self.BUTTON_CHAIN_FORWARD=self.controller_1.buttonL1
+        self.BUTTON_CHAIN_REVERSE=self.controller_1.buttonL2
+        self.BUTTON_EXTRA_MOTOR1=self.controller_1.buttonR1
+        self.BUTTON_EXTRA_MOTOR2=self.controller_1.buttonR2
+        self.BUTTON_FINGER=self.controller_1.buttonX
 
-VALUE_DEADZONE=10
-VALUE_SIDE="right"
+        self.VALUE_MULTIPLIER_DRIVE=0.85
+        self.VALUE_MULTIPLIER_TURN=0.4
+        self.VALUE_MULTIPLIER_CHAIN=1
+        self.VALUE_FINGER_POSITION=1.4
 
-BUTTON_CHAIN_FORWARD=controller_1.buttonL1
-BUTTON_CHAIN_REVERSE=controller_1.buttonL2
-BUTTON_EXTRA_MOTOR1=controller_1.buttonR1
-BUTTON_EXTRA_MOTOR2=controller_1.buttonR2
-BUTTON_FINGER=controller_1.buttonX
-
-VALUE_MULTIPLIER_DRIVE=0.85
-VALUE_MULTIPLIER_TURN=0.4
-VALUE_MULTIPLIER_CHAIN=1
-VALUE_FINGER_POSITION=1.4
-
-VALUE_SINGLE_DEGREE=1597208273
-
-
-
-# Variable to check whether the timer is currently runnning
-isgoing = False
-isfingerdown = True
-
-def turn_degrees(d,wait=False):
-    Right.set_position(0,TURNS)
-    Left.set_position(0,TURNS)
-    Right.spin_to_position((VALUE_SINGLE_DEGREE*d)/200000000000,TURNS,wait=False)
-    Left.spin_to_position(0-(VALUE_SINGLE_DEGREE*d)/200000000000,TURNS,wait=wait)
-
-def move_forward(inches,wait=False):
-    Right.set_position(0,TURNS)
-    Left.set_position(0,TURNS)
-    Right.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=False)
-    Left.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=wait)
-
-def autonomous_old():
-    Chain.set_velocity(100,PERCENT)
-    Chain.spin(REVERSE)
-    move_forward(10,True)
-    wait(10, SECONDS)
-    # turn_degrees(-90,True)
+        self.VALUE_SINGLE_DEGREE=1597208273
+    def initializeRandomSeed(self):
+        wait(100, MSEC)
+        random = self.brain.battery.voltage(MV) + self.brain.battery.current(CurrentUnits.AMP) * 100 + self.brain.timer.system_high_res()
+        urandom.seed(int(random))
+    def turn_degrees(self,d,wait=False):
+        self.Right.set_position(0,TURNS)
+        self.Left.set_position(0,TURNS)
+        self.Right.spin_to_position((self.VALUE_SINGLE_DEGREE*d)/200000000000,TURNS,wait=False)
+        self.Left.spin_to_position(0-(self.VALUE_SINGLE_DEGREE*d)/200000000000,TURNS,wait=wait)
+    def move_forward(self,inches,wait=False):
+        self.Right.set_position(0,TURNS)
+        self.Left.set_position(0,TURNS)
+        self.Right.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=False)
+        self.Left.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=wait)
 
 # If it ain't broke, don't fix it.
 def autonomous():
