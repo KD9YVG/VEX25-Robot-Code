@@ -15,7 +15,7 @@ class CycloneRobotState:
     def __init__(self) -> None:
         self.isTimerRunning=False
         self.isFingerDown=True
-
+        self.extramotoron=False
 class CycloneRobotCodeApp:
     def __init__(self) -> None:
         self.brain=Brain()
@@ -66,65 +66,56 @@ class CycloneRobotCodeApp:
         self.Left.set_position(0,TURNS)
         self.Right.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=False)
         self.Left.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=wait)
+    def autonomous(self):
+        self.brain.screen.print("Auto running")
+        self.fingercallback(False)
+        self.move_forward(-36,True)
+        self.fingercallback()
+        #move_forward(2)
+        self.Chain.set_velocity(100,PERCENT)
+        self.Chain.spin(REVERSE)
+        wait(3, SECONDS)
+        self.Chain.spin(FORWARD)
+        self.fingercallback()
+        self.move_forward(20, True)
+        self.fingercallback()
+        self.Chain.stop()
+        self.turn_degrees(75 if self.VALUE_SIDE=="right" else -75, True)
+        self.move_forward(-30,True)
+    def deadzonify(self,inputvalue):
+        # Make the input zero if the absolute value
+        # is less than the deadzone.
 
-# If it ain't broke, don't fix it.
-def autonomous():
-    brain.screen.print("Auto running")
-    fingercallback(False)
-    move_forward(-36,True)
-    fingercallback()
-    #move_forward(2)
-    Chain.set_velocity(100,PERCENT)
-    Chain.spin(REVERSE)
-    wait(3, SECONDS)
-    Chain.spin(FORWARD)
-    fingercallback()
-    move_forward(20, True)
-    fingercallback()
-    Chain.stop()
-    turn_degrees(75 if VALUE_SIDE=="right" else -75, True)
-    move_forward(-30,True)
-
-def deadzonify(inputvalue):
-    # Make the input zero if the absolute value
-    # is less than the deadzone.
-
-    # Check the absolute value, so that small
-    # NEGATIVE values are also ignored
-    if abs(inputvalue)<VALUE_DEADZONE:
-        # If it's less than the deadzone, make it zero.
-        return 0
-    # Otherwise, don't change it.
-    return inputvalue
-def fingercallback(wait=True):
-    global isfingerdown
-    isfingerdown=not isfingerdown
-    Finger.set_velocity(100, PERCENT)
-    if isfingerdown:
-        Finger.spin_to_position(0, TURNS,wait=wait)
-    else:
-        Finger.stop()
-        Finger.spin_to_position(-1*VALUE_FINGER_POSITION,TURNS,wait=wait)
-fingercallback()
-fingercallback()
-
-#COCKROACH WAS HERE
-
-extramotoron=False
-def extramotor1():
-    global extramotoron
-    extramotoron=not extramotoron
-    if extramotoron:
-        Extra.spin(FORWARD)
-    else:
-        Extra.stop()
-def extramotor2():
-    global extramotoron
-    extramotoron=not extramotoron
-    if extramotoron:
-        Extra.spin(REVERSE)
-    else:
-        Extra.stop()
+        # Check the absolute value, so that small
+        # NEGATIVE values are also ignored
+        if abs(inputvalue)<self.VALUE_DEADZONE:
+            # If it's less than the deadzone, make it zero.
+            return 0
+        # Otherwise, don't change it.
+        return inputvalue
+    def fingercallback(self,wait=True):
+        global isfingerdown
+        self.state.isFingerDown=not self.state.isFingerDown
+        self.Finger.set_velocity(100, PERCENT)
+        if self.state.isFingerDown:
+            self.Finger.spin_to_position(0, TURNS,wait=wait)
+        else:
+            self.Finger.stop()
+            self.Finger.spin_to_position(-1*self.VALUE_FINGER_POSITION,TURNS,wait=wait)
+    def extramotor1(self):
+        global extramotoron
+        extramotoron=not extramotoron
+        if extramotoron:
+            self.Extra.spin(FORWARD)
+        else:
+            self.Extra.stop()
+    def extramotor2(self):
+        global extramotoron
+        extramotoron=not extramotoron
+        if extramotoron:
+            self.Extra.spin(REVERSE)
+        else:
+            self.Extra.stop()
 
 def when_started():
     # Clear the screen and tell the user
