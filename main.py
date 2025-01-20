@@ -21,6 +21,7 @@ Right = Motor(Ports.PORT2, GearSetting.RATIO_18_1, True)
 Chain = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)
 String = Motor(Ports.PORT4, GearSetting.RATIO_18_1, False)
 Finger = Motor(Ports.PORT5, GearSetting.RATIO_18_1, False)
+Extra = Motor(Ports.PORT20, GearSetting.RATIO_18_1, False)
 
 
 # wait for rotation sensor to fully initialize
@@ -72,8 +73,8 @@ DEADZONE=10
 # it is easier to visualize and modify.
 BUTTON_CHAIN_FORWARD=controller_1.buttonL1
 BUTTON_CHAIN_REVERSE=controller_1.buttonL2
-BUTTON_STRING_FORWARD=controller_1.buttonR1
-BUTTON_STRING_REVERSE=controller_1.buttonR2
+BUTTON_EXTRA_MOTOR1=controller_1.buttonR1
+BUTTON_EXTRA_MOTOR2=controller_1.buttonR2
 
 # Buttons for finger movements
 BUTTON_FINGER=controller_1.buttonX
@@ -176,6 +177,21 @@ fingercallback()
 
 #COCKROACH WAS HERE
 
+extramotoron=False
+def extramotor1():
+    global extramotoron
+    extramotoron=not extramotoron
+    if extramotoron:
+        Extra.spin(FORWARD)
+    else:
+        Extra.stop()
+def extramotor2():
+    global extramotoron
+    extramotoron=not extramotoron
+    if extramotoron:
+        Extra.spin(REVERSE)
+    else:
+        Extra.stop()
 
 def when_started():
     # Clear the screen and tell the user
@@ -188,10 +204,8 @@ def when_started():
     BUTTON_CHAIN_FORWARD.released(Chain.stop)
     BUTTON_CHAIN_REVERSE.pressed(lambda: Chain.spin(REVERSE))
     BUTTON_CHAIN_REVERSE.released(Chain.stop)
-    BUTTON_STRING_FORWARD.pressed(lambda: String.spin(FORWARD))
-    BUTTON_STRING_FORWARD.released(String.stop)
-    BUTTON_STRING_REVERSE.pressed(lambda: String.spin(REVERSE))
-    BUTTON_STRING_REVERSE.released(String.stop)
+    BUTTON_EXTRA_MOTOR1.released(extramotor1)
+    BUTTON_EXTRA_MOTOR2.released(extramotor2)
     BUTTON_FINGER.released(fingercallback)
     AXIS_DRIVE_FORWARD_AND_BACKWARD.changed(setaxis)
     AXIS_TURN_LEFT_AND_RIGHT.changed(setaxis)
@@ -206,6 +220,7 @@ def when_started():
     # Set left motor and right motor to zero, because of the note below.
     Left.set_velocity(0,PERCENT)
     Right.set_velocity(0,PERCENT)
+    Extra.set_velocity(100,PERCENT)
     # When the left and right motors
     # are moving, we need to set_velocity to
     # the controller's input percentage.
