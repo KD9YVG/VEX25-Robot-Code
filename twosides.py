@@ -7,14 +7,7 @@ def do(side):
     else:
         main=main.replace('AUTO_SIDE="left"','AUTO_SIDE="right"')
 
-    import json
-    vex=json.load(open(".vscode/vex_project_settings.json"))
-    vex["project"]["name"]="Left" if side=="l" else "Right"
-    vex["project"]["slot"]=1 if side=="l" else 2
-
     print("Left" if side=="l" else "Right","configured.")
-
-    json.dump(vex,open(".vscode/vex_project_settings.json","w"))
 
 
 do("l")
