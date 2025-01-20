@@ -45,66 +45,18 @@ print("\033[2J")
 
 #endregion default definitions and config
 
+class dumbobj:
+    def __init__(self,d):
+        pass
+    def __getattr__(self,name):
+        raise NameError("Name "+name+" is not defined.")
 
-# Start constants
+#Generated constant map
+CONST=dumbobj(
+           {'JOYSTICK':{'DRIVE':controller_1.axis3,'TURN':controller_1.axis1},'VALUE':{'DEADZONE':10,'SIDE':'right','MULTIPLIER':{'DRIVE':0.85,'TURN':0.4,'CHAIN':1},'FINGER_POSITION':1.4,'SINGLE_DEGREE':1597208273},'BUTTON':{'CHAIN':{'FORWARD':controller_1.buttonL1,'REVERSE':controller_1.buttonL2},'EXTRA':{'BUTTON1':controller_1.buttonR1,'BUTTON2':controller_1.buttonR2},'FINGER':controller_1.buttonX}}
+           )
 
-# Define axis3, the left stick up/down,
-# as the stick to drive forward and backwards.
-AXIS_DRIVE_FORWARD_AND_BACKWARD=controller_1.axis3
 
-# Define axis1, the right stick left/right,
-# as the stick to turn the robot.
-AXIS_TURN_LEFT_AND_RIGHT=controller_1.axis1
-
-# Set the deadzone for the controller,
-# so that if any analog input is less than the deadzone,
-# it is ignored.
-DEADZONE=10
-
-# Define the buttons to control the chain.
-# All of the controls are grouped so that
-# it is easier to visualize and modify.
-BUTTON_CHAIN_FORWARD=controller_1.buttonL1
-BUTTON_CHAIN_REVERSE=controller_1.buttonL2
-BUTTON_EXTRA_MOTOR1=controller_1.buttonR1
-BUTTON_EXTRA_MOTOR2=controller_1.buttonR2
-
-AUTO_SIDE="right"
-
-# Buttons for finger movements
-BUTTON_FINGER=controller_1.buttonX
-
-# Define the speed multipliers. These should
-# be values between 0 and 1.
-
-# Speed multiplier of the whole drivetrain,
-# usually should not change.
-NUMBER_OVERALL_SPEED=1
-
-# Multiplier for forward and backward
-NUMBER_DRIVE_SPEED=0.85
-
-# Multiplier for turning
-NUMBER_TURN_SPEED=0.4
-
-# Speed to move the string at
-NUMBER_STRING_SPEED=0.1
-NUMBER_STRING_HARDSTOP=0
-# IMPORTANT NOTE: The string and chain
-# use digital inputs, so the string
-# is not able to move faster or slower
-# than this speed.
-
-# Set this to 0.15 if you need to adjust
-# the hardstop.
-
-# Speed to move the chain at. See the note
-# above about digital inputs.
-NUMBER_CHAIN_SPEED=1
-
-SINGLE_DEGREE=1597208273
-
-#endregion constants
 
 # Variable to check whether the timer is currently runnning
 isgoing = False
@@ -113,8 +65,8 @@ isfingerdown = True
 def turn_degrees(d,wait=False):
     Right.set_position(0,TURNS)
     Left.set_position(0,TURNS)
-    Right.spin_to_position((SINGLE_DEGREE*d)/200000000000,TURNS,wait=False)
-    Left.spin_to_position(0-(SINGLE_DEGREE*d)/200000000000,TURNS,wait=wait)
+    Right.spin_to_position((CONST.VALUE.SINGLE_DEGREE*d)/200000000000,TURNS,wait=False)
+    Left.spin_to_position(0-(CONST.VALUE.SINGLE_DEGREE*d)/200000000000,TURNS,wait=wait)
 
 def move_forward(inches,wait=False):
     Right.set_position(0,TURNS)
@@ -144,7 +96,7 @@ def autonomous():
     move_forward(20, True)
     fingercallback()
     Chain.stop()
-    turn_degrees(75 if AUTO_SIDE=="right" else -75, True)
+    turn_degrees(75 if CONST.VALUE.SIDE=="right" else -75, True)
     move_forward(-30,True)
 
 def deadzonify(inputvalue):
@@ -153,7 +105,7 @@ def deadzonify(inputvalue):
 
     # Check the absolute value, so that small
     # NEGATIVE values are also ignored
-    if abs(inputvalue)<DEADZONE:
+    if abs(inputvalue)<CONST.VALUE.DEADZONE:
         # If it's less than the deadzone, make it zero.
         return 0
     # Otherwise, don't change it.
@@ -166,7 +118,7 @@ def fingercallback(wait=True):
         Finger.spin_to_position(0, TURNS,wait=wait)
     else:
         Finger.stop()
-        Finger.spin_to_position(-1.4,TURNS,wait=wait)
+        Finger.spin_to_position(-1*CONST.VALUE.FINGER_POSITION,TURNS,wait=wait)
 fingercallback()
 fingercallback()
 
@@ -195,22 +147,22 @@ def when_started():
     controller_1.screen.set_cursor(1,1)
     controller_1.screen.print("Hold B for timer")
     # Add callbacks for each button and axis
-    BUTTON_CHAIN_FORWARD.pressed(lambda: Chain.spin(FORWARD))
-    BUTTON_CHAIN_FORWARD.released(Chain.stop)
-    BUTTON_CHAIN_REVERSE.pressed(lambda: Chain.spin(REVERSE))
-    BUTTON_CHAIN_REVERSE.released(Chain.stop)
-    BUTTON_EXTRA_MOTOR1.released(extramotor1)
-    BUTTON_EXTRA_MOTOR2.released(extramotor2)
-    BUTTON_FINGER.released(fingercallback)
-    AXIS_DRIVE_FORWARD_AND_BACKWARD.changed(setaxis)
-    AXIS_TURN_LEFT_AND_RIGHT.changed(setaxis)
+    CONST.BUTTON.CHAIN.FORWARD.pressed(lambda: Chain.spin(FORWARD))
+    CONST.BUTTON.CHAIN.FORWARD.released(Chain.stop)
+    CONST.BUTTON.CHAIN.REVERSE.pressed(lambda: Chain.spin(REVERSE))
+    CONST.BUTTON.CHAIN.REVERSE.released(Chain.stop)
+    CONST.BUTTON.EXTRA.MOTOR1.released(extramotor1)
+    CONST.BUTTON.EXTRA.MOTOR2.released(extramotor2)
+    CONST.BUTTON.FINGER.released(fingercallback)
+    CONST.JOYSTICK.DRIVE.changed(setaxis)
+    CONST.JOYSTICK.TURN.changed(setaxis)
     # I really should make buttonB a constant, like BUTTON_TIMER
     # or something. And make the callbacks "timerpressed" instead
     # of "timerpressed"
     controller_1.buttonB.released(timerreleased)
     controller_1.buttonB.pressed(timerpressed)
     # Make the chain and string go the speed we've defined
-    Chain.set_velocity(NUMBER_CHAIN_SPEED*100,PERCENT)
+    Chain.set_velocity(CONST.VALUE.MULTIPLIER.CHAIN*100,PERCENT)
     # Set left motor and right motor to zero, because of the note below.
     Left.set_velocity(0,PERCENT)
     Right.set_velocity(0,PERCENT)
@@ -238,16 +190,16 @@ def when_started():
 # Callback when any axis is changed
 def setaxis():
     # includes drive multiplier AND overall mult
-    drive_speed_multiplier=(NUMBER_OVERALL_SPEED*NUMBER_DRIVE_SPEED)
+    drive_speed_multiplier=CONST.VALUE.MULTIPLIER.DRIVE
     # Position of the axis, taking deadzone into account
-    axis_position=deadzonify(AXIS_DRIVE_FORWARD_AND_BACKWARD.position())
+    axis_position=deadzonify(CONST.JOYSTICK.TURN.position())
     # Make the axis inverted, to fix an inverted driving issue we had
     updownpos=drive_speed_multiplier*(0-axis_position)
 
     # Includes turn multiplier AND overall mult
-    turn_speed_multiplier=(NUMBER_OVERALL_SPEED*NUMBER_TURN_SPEED)
+    turn_speed_multiplier=CONST.VALUE.MULTIPLIER.TURN
     # Position of the axis, taking deadzone into account
-    axis_position=deadzonify(AXIS_TURN_LEFT_AND_RIGHT.position())
+    axis_position=deadzonify(CONST.JOYSTICK.TURN.position())
     # Do the final computations, as above.
     leftrightpos=turn_speed_multiplier*axis_position
 
