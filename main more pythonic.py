@@ -17,6 +17,7 @@ class CycloneRobotState:
         self.isFingerDown=True
         self.extramotoron=False
         self.changedIsTimerRunning=False
+        self.timerdisplay=0.0
 class CycloneRobotCodeApp:
     def __init__(self) -> None:
         self.brain=Brain()
@@ -125,9 +126,10 @@ class CycloneRobotCodeApp:
     def driver_control(self):
         # Clear the screen and tell the user
         # how to start the timer.
-        self.controller_1.screen.clear_screen()
-        self.controller_1.screen.set_cursor(1,1)
-        self.controller_1.screen.print("Hold B for timer")
+        self.timerpressed()
+        self.timerreleased()
+        self.timerpressed()
+        self.timerreleased()
         # Add callbacks for each button and axis
         self.BUTTON_CHAIN_FORWARD.pressed(lambda: self.Chain.spin(FORWARD))
         self.BUTTON_CHAIN_FORWARD.released(self.Chain.stop)
@@ -162,14 +164,22 @@ class CycloneRobotCodeApp:
         while self.competition.is_autonomous() or self.competition.is_driver_control():
             # While the timer is running,
             # display the timer value on the screen.
-            if self.state.isTimerRunning and self.competition.is_driver_control():
-                self.controller_1.screen.clear_row(1)
+            self.controller_1.screen.clear_screen()
+            self.controller_1.screen.set_cursor(1,1)
+            if self.state.isTimerRunning:
+                self.controller_1.screen.print("B -> stop timer")
+                self.state.timerdisplay=self.brain.timer.time(SECONDS)
                 self.controller_1.screen.set_cursor(2,1)
-                self.controller_1.screen.print(self.brain.timer.time(SECONDS))
-                if self.state.isFingerDown:
-                    self.controller_1.screen.print("Finger open  v")
-                else:
-                    self.controller_1.screen.print("Finger closed ^")
+                self.controller_1.screen.print(self.state.timerdisplay)
+            else:
+                self.controller_1.screen.print("Timer off")
+                self.controller_1.screen.set_cursor(2,1)
+                self.controller_1.screen.print(self.state.timerdisplay)
+            self.controller_1.screen.set_cursor(3,1)
+            if self.state.isFingerDown:
+                self.controller_1.screen.print("Finger open  v")
+            else:
+                self.controller_1.screen.print("Finger closed ^")
                 
             # Make sure the event loop doesn't get bogged down.
             wait(15,MSEC)
@@ -198,10 +208,10 @@ class CycloneRobotCodeApp:
             self.state.changedIsTimerRunning=True
             self.controller_1.screen.clear_screen()
             self.controller_1.screen.set_cursor(2,1)
-            self.controller_1.screen.print(str(self.brain.timer.time(SECONDS)))
+            self.state.timerdisplay=self.brain.timer.time(SECONDS)
             self.controller_1.screen.set_cursor(1,1)
-            self.controller_1.screen.print("Hold B for timer")
         else:
+            self.state.timerdisplay=0
             self.controller_1.screen.clear_screen()
             self.controller_1.screen.set_cursor(1,1)
             self.controller_1.screen.print("Let go of B to start!")
