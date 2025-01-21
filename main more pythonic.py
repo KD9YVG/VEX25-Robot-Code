@@ -16,6 +16,7 @@ class CycloneRobotState:
         self.isTimerRunning=False
         self.isFingerDown=True
         self.extramotoron=False
+        self.changedIsTimerRunning=False
 class CycloneRobotCodeApp:
     def __init__(self) -> None:
         self.brain=Brain()
@@ -116,117 +117,110 @@ class CycloneRobotCodeApp:
             self.Extra.spin(REVERSE)
         else:
             self.Extra.stop()
+    def when_started(self):
+        self.Chain.set_stopping(HOLD)
+        self.controller_1.screen.clear_screen()
+        self.controller_1.screen.set_cursor(1,1)
+        self.controller_1.screen.print("Please wait")
+    def driver_control(self):
+        # Clear the screen and tell the user
+        # how to start the timer.
+        self.controller_1.screen.clear_screen()
+        self.controller_1.screen.set_cursor(1,1)
+        self.controller_1.screen.print("Hold B for timer")
+        # Add callbacks for each button and axis
+        self.BUTTON_CHAIN_FORWARD.pressed(lambda: self.Chain.spin(FORWARD))
+        self.BUTTON_CHAIN_FORWARD.released(self.Chain.stop)
+        self.BUTTON_CHAIN_REVERSE.pressed(lambda: self.Chain.spin(REVERSE))
+        self.BUTTON_CHAIN_REVERSE.released(self.Chain.stop)
+        self.BUTTON_EXTRA_MOTOR1.released(self.extramotor1)
+        self.BUTTON_EXTRA_MOTOR2.released(self.extramotor2)
+        self.BUTTON_FINGER.released(self.fingercallback)
+        self.JOYSTICK_DRIVE.changed(self.setaxis)
+        self.JOYSTICK_TURN.changed(self.setaxis)
+        # I really should make buttonB a constant, like BUTTON_TIMER
+        # or something. And make the callbacks "timerpressed" instead
+        # of "timerpressed"
+        self.controller_1.buttonB.released(self.timerreleased)
+        self.controller_1.buttonB.pressed(self.timerpressed)
+        # Make the chain and string go the speed we've defined
+        self.Chain.set_velocity(self.VALUE_MULTIPLIER_CHAIN*100,PERCENT)
+        # Set left motor and right motor to zero, because of the note below.
+        self.Left.set_velocity(0,PERCENT)
+        self.Right.set_velocity(0,PERCENT)
+        self.Extra.set_velocity(100,PERCENT)
+        # When the left and right motors
+        # are moving, we need to set_velocity to
+        # the controller's input percentage.
+        # When the controller is moved, the velocity
+        # is changed. The easiest way to do this
+        # is to make it always "on", just at 0%.
+        self.Left.spin(REVERSE)
+        self.Right.spin(FORWARD)
+        # Finger should brake when not being moved.
+        self.Finger.set_stopping(BRAKE)
+        while self.competition.is_autonomous() or self.competition.is_driver_control():
+            # While the timer is running,
+            # display the timer value on the screen.
+            if self.state.isTimerRunning and self.competition.is_driver_control():
+                self.controller_1.screen.clear_row(1)
+                self.controller_1.screen.set_cursor(2,1)
+                self.controller_1.screen.print(self.brain.timer.time(SECONDS))
+                if self.state.isFingerDown:
+                    self.controller_1.screen.print("Finger open  v")
+                else:
+                    self.controller_1.screen.print("Finger closed ^")
+                
+            # Make sure the event loop doesn't get bogged down.
+            wait(15,MSEC)
+    def setaxis(self):
+        # includes drive multiplier AND overall mult
+        drive_speed_multiplier=self.VALUE_MULTIPLIER_DRIVE
+        # Position of the axis, taking deadzone into account
+        axis_position=self.deadzonify(self.JOYSTICK_TURN.position())
+        # Make the axis inverted, to fix an inverted driving issue we had
+        updownpos=drive_speed_multiplier*(0-axis_position)
 
-def when_started():
-    # Clear the screen and tell the user
-    # how to start the timer.
-    controller_1.screen.clear_screen()
-    controller_1.screen.set_cursor(1,1)
-    controller_1.screen.print("Hold B for timer")
-    # Add callbacks for each button and axis
-    BUTTON_CHAIN_FORWARD.pressed(lambda: Chain.spin(FORWARD))
-    BUTTON_CHAIN_FORWARD.released(Chain.stop)
-    BUTTON_CHAIN_REVERSE.pressed(lambda: Chain.spin(REVERSE))
-    BUTTON_CHAIN_REVERSE.released(Chain.stop)
-    BUTTON_EXTRA_MOTOR1.released(extramotor1)
-    BUTTON_EXTRA_MOTOR2.released(extramotor2)
-    BUTTON_FINGER.released(fingercallback)
-    JOYSTICK_DRIVE.changed(setaxis)
-    JOYSTICK_TURN.changed(setaxis)
-    # I really should make buttonB a constant, like BUTTON_TIMER
-    # or something. And make the callbacks "timerpressed" instead
-    # of "timerpressed"
-    controller_1.buttonB.released(timerreleased)
-    controller_1.buttonB.pressed(timerpressed)
-    # Make the chain and string go the speed we've defined
-    Chain.set_velocity(VALUE_MULTIPLIER_CHAIN*100,PERCENT)
-    # Set left motor and right motor to zero, because of the note below.
-    Left.set_velocity(0,PERCENT)
-    Right.set_velocity(0,PERCENT)
-    Extra.set_velocity(100,PERCENT)
-    # When the left and right motors
-    # are moving, we need to set_velocity to
-    # the controller's input percentage.
-    # When the controller is moved, the velocity
-    # is changed. The easiest way to do this
-    # is to make it always "on", just at 0%.
-    Left.spin(REVERSE)
-    Right.spin(FORWARD)
-    # Finger should brake when not being moved.
-    Finger.set_stopping(BRAKE)
-    while competition.is_autonomous() or competition.is_driver_control():
-        # While the timer is running,
-        # display the timer value on the screen.
-        if isgoing:
-            controller_1.screen.clear_row(1)
-            controller_1.screen.set_cursor(2,1)
-            controller_1.screen.print(brain.timer.time(SECONDS))
-        # Make sure the event loop doesn't get bogged down.
-        wait(15,MSEC)
+        # Includes turn multiplier AND overall mult
+        turn_speed_multiplier=self.VALUE_MULTIPLIER_TURN
+        # Position of the axis, taking deadzone into account
+        axis_position=self.deadzonify(self.JOYSTICK_TURN.position())
+        # Do the final computations, as above.
+        leftrightpos=turn_speed_multiplier*axis_position
 
-# Callback when any axis is changed
-def setaxis():
-    # includes drive multiplier AND overall mult
-    drive_speed_multiplier=VALUE_MULTIPLIER_DRIVE
-    # Position of the axis, taking deadzone into account
-    axis_position=deadzonify(JOYSTICK_TURN.position())
-    # Make the axis inverted, to fix an inverted driving issue we had
-    updownpos=drive_speed_multiplier*(0-axis_position)
-
-    # Includes turn multiplier AND overall mult
-    turn_speed_multiplier=VALUE_MULTIPLIER_TURN
-    # Position of the axis, taking deadzone into account
-    axis_position=deadzonify(JOYSTICK_TURN.position())
-    # Do the final computations, as above.
-    leftrightpos=turn_speed_multiplier*axis_position
-
-    # Make the motors carry out the rotation amounts we defined
-    if True: #urandom.rand()>0.5:
-        Left.set_velocity(updownpos+leftrightpos,PERCENT)
-        Right.set_velocity(updownpos-leftrightpos,PERCENT)
-    #else:
-    #    Right.set_velocity(updownpos-leftrightpos,PERCENT)
-    #    Left.set_velocity(updownpos+leftrightpos,PERCENT)
-# Make sure the timer isn't started on press,
-# and then stopped on the same release.
-justchangedisgoing=False
-
-# Callback when timer button pressed
-def timerpressed():
-    global isgoing,justchangedisgoing
-    if isgoing:
-        # Get ready and show how to time
-        isgoing=False
-        justchangedisgoing=True
-        controller_1.screen.clear_screen()
-        controller_1.screen.set_cursor(2,1)
-        controller_1.screen.print(str(brain.timer.time(SECONDS)))
-        controller_1.screen.set_cursor(1,1)
-        controller_1.screen.print("Hold B for timer")
-    else:
-        # Display message showing how to start
-        controller_1.screen.clear_screen()
-        controller_1.screen.set_cursor(1,1)
-        controller_1.screen.print("Let go of B to start!")
-
-# Callback when timer button released
-def timerreleased():
-    global isgoing,justchangedisgoing
-    if not isgoing:
-        if justchangedisgoing:
-            justchangedisgoing=False
+        # Make the motors carry out the rotation amounts we defined
+        if True: #urandom.rand()>0.5:
+            self.Left.set_velocity(updownpos+leftrightpos,PERCENT)
+            self.Right.set_velocity(updownpos-leftrightpos,PERCENT)
+    def timerpressed(self):
+        if self.state.isTimerRunning:
+            self.state.isTimerRunning=False
+            self.state.changedIsTimerRunning=True
+            self.controller_1.screen.clear_screen()
+            self.controller_1.screen.set_cursor(2,1)
+            self.controller_1.screen.print(str(self.brain.timer.time(SECONDS)))
+            self.controller_1.screen.set_cursor(1,1)
+            self.controller_1.screen.print("Hold B for timer")
         else:
-            # Clear timer, and inform user how to stop.
-            brain.timer.clear()
-            controller_1.screen.set_cursor(1,1)
-            controller_1.screen.print("Press B to stop")
-            isgoing=True
-
-# Make intake hold its position when stopped
-Chain.set_stopping(HOLD)
-
+            self.controller_1.screen.clear_screen()
+            self.controller_1.screen.set_cursor(1,1)
+            self.controller_1.screen.print("Let go of B to start!")
+    def timerreleased(self):
+        if not self.state.isTimerRunning:
+            if self.state.changedIsTimerRunning:
+                self.state.changedIsTimerRunning=False
+            else:
+                self.brain.timer.clear()
+                self.controller_1.screen.set_cursor(1,1)
+                self.controller_1.screen.print("Press B to stop")
+                self.state.isTimerRunning=True
+    def register_competition(self):
+        self.when_started()
+        self.competition = Competition(self.driver_control, self.autonomous)
+def main():
+    RobotApp=CycloneRobotCodeApp()
+    RobotApp.register_competition()
 wait(15,MSEC)
-
-# Define the competition object so that the field
-# can find our driver control and autonomous functions
-competition = Competition(when_started, autonomous)
+print(__name__)
+if __name__=="__main__":
+    main()
