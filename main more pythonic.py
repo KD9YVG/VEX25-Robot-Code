@@ -51,7 +51,7 @@ class CycloneRobotCodeApp:
         self.VALUE_MULTIPLIER_DRIVE=0.85
         self.VALUE_MULTIPLIER_TURN=0.4
         self.VALUE_MULTIPLIER_CHAIN=1
-        self.VALUE_FINGER_POSITION=1.4
+        self.VALUE_FINGER_POSITION=1.8
 
         self.VALUE_SINGLE_DEGREE=1597208273
     def initializeRandomSeed(self):
@@ -69,6 +69,8 @@ class CycloneRobotCodeApp:
         self.Right.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=False)
         self.Left.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=wait)
     def autonomous(self):
+        #self.Left.set_velocity(100,PERCENT)
+        #self.Right.set_velocity(100,PERCENT)
         self.fingercallback()
         self.brain.screen.print("Auto running")
         self.fingercallback(False)
@@ -83,8 +85,9 @@ class CycloneRobotCodeApp:
         self.move_forward(20, True)
         self.fingercallback()
         self.Chain.stop()
-        self.turn_degrees(75 if self.VALUE_SIDE=="right" else -75, True)
+        self.turn_degrees(75 if self.VALUE_SIDE=="right" else -40, True)
         self.move_forward(-30,True)
+        self.brain.program_stop()
     def deadzonify(self,inputvalue):
         # Make the input zero if the absolute value
         # is less than the deadzone.
@@ -117,7 +120,7 @@ class CycloneRobotCodeApp:
         else:
             self.Extra.stop()
     def when_started(self):
-        if self.controller_1.buttonY.pressing() and self.controller_1.buttonA.pressing():
+        if self.controller_1.buttonY.pressing():
             if self.controller_1.buttonX.pressing():
                 self.state.isFingerDown=False
                 self.Finger.set_position(0,TURNS)
@@ -126,7 +129,7 @@ class CycloneRobotCodeApp:
                 self.state.isFingerDown=True
                 self.Finger.set_position(-1*self.VALUE_FINGER_POSITION,TURNS)
                 self.fingercallback()
-            exit()
+            self.brain.program_stop()
         self.Chain.set_stopping(HOLD)
         self.controller_1.screen.clear_screen()
         self.controller_1.screen.set_cursor(1,1)
