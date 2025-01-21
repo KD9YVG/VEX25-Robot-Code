@@ -108,14 +108,14 @@ class CycloneRobotCodeApp:
         else:
             self.Finger.spin_to_position(0, TURNS,wait=wait)
     def extramotor1(self):
-        self.extramotoron=not self.extramotoron
-        if self.extramotoron:
+        self.state.extramotoron=not self.state.extramotoron
+        if self.state.extramotoron:
             self.Extra.spin(FORWARD)
         else:
             self.Extra.stop()
     def extramotor2(self):
-        self.extramotoron=not self.extramotoron
-        if self.extramotoron:
+        self.state.extramotoron=not self.state.extramotoron
+        if self.state.extramotoron:
             self.Extra.spin(REVERSE)
         else:
             self.Extra.stop()
