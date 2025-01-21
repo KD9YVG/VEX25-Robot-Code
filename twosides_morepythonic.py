@@ -2,10 +2,10 @@ import os
 
 def do(side):
     main=open("main more pythonic.py").read()
-    #if side=="l":
-        #main=main.replace('AUTO_SIDE="right"','AUTO_SIDE="left"')
-    #else:
-        #main=main.replace('AUTO_SIDE="left"','AUTO_SIDE="right"')
+    if side=="l":
+        main=main.replace('self.VALUE_SIDE="right"','self.VALUE_SIDE="left"')
+    else:
+        main=main.replace('self.VALUE_SIDE="left"','self.VALUE_SIDE="right"')
     open("main more pythonic.py","w").write(main)
     print("Left" if side=="l" else "Right","configured.")
 
