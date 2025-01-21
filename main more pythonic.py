@@ -117,6 +117,16 @@ class CycloneRobotCodeApp:
         else:
             self.Extra.stop()
     def when_started(self):
+        if self.controller_1.buttonY.pressing() and self.controller_1.buttonA.pressing():
+            if self.controller_1.buttonX.pressing():
+                self.state.isFingerDown=False
+                self.Finger.set_position(0,TURNS)
+                self.fingercallback()
+            elif self.controller_1.buttonB.pressing():
+                self.state.isFingerDown=True
+                self.Finger.set_position(-1*self.VALUE_FINGER_POSITION,TURNS)
+                self.fingercallback()
+            exit()
         self.Chain.set_stopping(HOLD)
         self.controller_1.screen.clear_screen()
         self.controller_1.screen.set_cursor(1,1)
