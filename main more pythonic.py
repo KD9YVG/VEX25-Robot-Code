@@ -69,12 +69,15 @@ class CycloneRobotCodeApp:
         self.Right.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=False)
         self.Left.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=wait)
     def autonomous(self):
-        self.Left.set_velocity(75,PERCENT)
-        self.Right.set_velocity(75,PERCENT)
+        self.Left.set_velocity(60,PERCENT)
+        self.Right.set_velocity(60,PERCENT)
         self.fingercallback()
         self.brain.screen.print("Auto running")
         self.fingercallback(False)
-        self.move_forward(-36,True)
+        for i in range(36):
+            self.move_forward(-1,True)
+            self.Left.set_velocity(100-i,PERCENT)
+            self.Right.set_velocity(100-i,PERCENT)
         self.fingercallback()
         #move_forward(2)
         self.Chain.set_velocity(100,PERCENT)
@@ -83,10 +86,17 @@ class CycloneRobotCodeApp:
         self.Chain.spin(FORWARD)
         self.fingercallback()
         self.move_forward(20, True)
-        self.fingercallback()
+        self.fingercallback(False)
         self.Chain.stop()
+        self.Left.set_velocity(100,PERCENT)
+        self.Right.set_velocity(100,PERCENT)
         self.turn_degrees(75 if self.VALUE_SIDE=="right" else -40, True)
-        self.move_forward(-30,True)
+        for i in range(30):
+            self.move_forward(-1,True)
+            self.Left.set_velocity(100-i,PERCENT)
+            self.Right.set_velocity(100-i,PERCENT)
+        self.move_forward(-10,True)
+        wait(5,SECONDS)
         self.brain.program_stop()
     def deadzonify(self,inputvalue):
         # Make the input zero if the absolute value
