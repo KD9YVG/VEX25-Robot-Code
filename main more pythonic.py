@@ -74,11 +74,8 @@ class CycloneRobotCodeApp:
         self.fingercallback()
         self.brain.screen.print("Auto running")
         self.fingercallback(False)
-        for i in range(36):
-            self.move_forward(-1,True)
-            self.Left.set_velocity(100-i,PERCENT)
-            self.Right.set_velocity(100-i,PERCENT)
-        self.fingercallback()
+        self.move_forward(-36,True)
+        self.fingercallback(True)
         #move_forward(2)
         self.Chain.set_velocity(100,PERCENT)
         self.Chain.spin(REVERSE)
@@ -91,13 +88,7 @@ class CycloneRobotCodeApp:
         self.Left.set_velocity(100,PERCENT)
         self.Right.set_velocity(100,PERCENT)
         self.turn_degrees(75 if self.VALUE_SIDE=="right" else -40, True)
-        for i in range(30):
-            self.move_forward(-1,True)
-            self.Left.set_velocity(100-i,PERCENT)
-            self.Right.set_velocity(100-i,PERCENT)
-        self.move_forward(-10,True)
-        wait(5,SECONDS)
-        self.brain.program_stop()
+        self.move_forward(-30,True)
     def deadzonify(self,inputvalue):
         # Make the input zero if the absolute value
         # is less than the deadzone.
@@ -185,6 +176,10 @@ class CycloneRobotCodeApp:
         while self.competition.is_autonomous() or self.competition.is_driver_control():
             # While the timer is running,
             # display the timer value on the screen.
+            if self.controller_1.buttonA.pressing():
+                self.VALUE_MULTIPLIER_DRIVE=200
+            else:
+                self.VALUE_MULTIPLIER_DRIVE=0.85
             self.controller_1.screen.clear_row(1)
             self.controller_1.screen.set_cursor(1,1)
             if self.state.isTimerRunning:
@@ -204,7 +199,10 @@ class CycloneRobotCodeApp:
                 self.controller_1.screen.print("Finger open  v")
             else:
                 self.controller_1.screen.print("Finger closed ^")
-                
+            print(self.Left.temperature())
+            print(self.Right.temperature())
+            print(self.Chain.temperature())
+            print("\n\n\n")
             # Make sure the event loop doesn't get bogged down.
             wait(15,MSEC)
     def setaxis(self):
