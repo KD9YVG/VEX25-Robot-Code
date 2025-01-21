@@ -96,14 +96,13 @@ class CycloneRobotCodeApp:
         # Otherwise, don't change it.
         return inputvalue
     def fingercallback(self,wait=True):
-        global isfingerdown
         self.state.isFingerDown=not self.state.isFingerDown
         self.Finger.set_velocity(100, PERCENT)
         if self.state.isFingerDown:
-            self.Finger.spin_to_position(0, TURNS,wait=wait)
-        else:
             self.Finger.stop()
             self.Finger.spin_to_position(-1*self.VALUE_FINGER_POSITION,TURNS,wait=wait)
+        else:
+            self.Finger.spin_to_position(0, TURNS,wait=wait)
     def extramotor1(self):
         self.extramotoron=not self.extramotoron
         if self.extramotoron:
