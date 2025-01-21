@@ -69,6 +69,7 @@ class CycloneRobotCodeApp:
         self.Right.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=False)
         self.Left.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=wait)
     def autonomous(self):
+        self.fingercallback()
         self.brain.screen.print("Auto running")
         self.fingercallback(False)
         self.move_forward(-36,True)
