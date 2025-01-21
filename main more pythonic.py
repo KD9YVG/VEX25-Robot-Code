@@ -164,18 +164,21 @@ class CycloneRobotCodeApp:
         while self.competition.is_autonomous() or self.competition.is_driver_control():
             # While the timer is running,
             # display the timer value on the screen.
-            self.controller_1.screen.clear_screen()
+            self.controller_1.screen.clear_row(1)
             self.controller_1.screen.set_cursor(1,1)
             if self.state.isTimerRunning:
                 self.controller_1.screen.print("B -> stop timer")
                 self.state.timerdisplay=self.brain.timer.time(SECONDS)
                 self.controller_1.screen.set_cursor(2,1)
+                self.controller_1.screen.clear_row(2)
                 self.controller_1.screen.print(self.state.timerdisplay)
             else:
                 self.controller_1.screen.print("Timer off")
                 self.controller_1.screen.set_cursor(2,1)
+                self.controller_1.screen.clear_row(2)
                 self.controller_1.screen.print(self.state.timerdisplay)
             self.controller_1.screen.set_cursor(3,1)
+            self.controller_1.screen.clear_row(3)
             if self.state.isFingerDown:
                 self.controller_1.screen.print("Finger open  v")
             else:
