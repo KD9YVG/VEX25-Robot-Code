@@ -187,7 +187,7 @@ class CycloneRobotCodeApp:
         # includes drive multiplier AND overall mult
         drive_speed_multiplier=self.VALUE_MULTIPLIER_DRIVE
         # Position of the axis, taking deadzone into account
-        axis_position=self.deadzonify(self.JOYSTICK_TURN.position())
+        axis_position=self.deadzonify(self.JOYSTICK_DRIVE.position())
         # Make the axis inverted, to fix an inverted driving issue we had
         updownpos=drive_speed_multiplier*(0-axis_position)
 
