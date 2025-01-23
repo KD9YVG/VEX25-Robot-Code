@@ -9,15 +9,15 @@ def do(side):
     open("main.py","w").write(main)
     print("Left" if side=="l" else "Right","configured.")
 
-winsound.Beep(500,50)
+winsound.Beep(500,500)
 do("l")
 print("Uploading left/slot 1")
 open(".gitignored/Left.py","w").write(open("main.py").read())
 r=os.system("c:\\Users\\kwate\\.vscode\\extensions\\vexrobotics.vexcode-0.6.1\\resources\\tools\\vexcom\\win32\\vexcom.exe --slot 1 --write .gitignored/Left.py --progress")
 if r==0:
-    winsound.Beep(700,50)
+    winsound.Beep(700,500)
 else:
-    winsound.Beep(300,50)
+    winsound.Beep(300,500)
 os.remove(".gitignored/Left.py")
 print("\n")
 do("r")
@@ -26,6 +26,6 @@ open(".gitignored/Right.py","w").write(open("main.py").read())
 r=os.system("c:\\Users\\kwate\\.vscode\\extensions\\vexrobotics.vexcode-0.6.1\\resources\\tools\\vexcom\\win32\\vexcom.exe --slot 2 --write .gitignored/Right.py --progress")
 os.remove(".gitignored/Right.py")
 if r==0:
-    winsound.Beep(700,50)
+    winsound.Beep(700,500)
 else:
-    winsound.Beep(300,50)
+    winsound.Beep(300,500)
