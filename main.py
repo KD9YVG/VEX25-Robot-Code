@@ -69,10 +69,11 @@ class CycloneRobotCodeApp:
         self.Right.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=False)
         self.Left.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=wait)
     def autonomous(self):
+        self.brain.timer.reset()
         self.Left.set_velocity(60,PERCENT)
         self.Right.set_velocity(60,PERCENT)
         self.fingercallback()
-        self.brain.screen.print("Auto running")
+        #self.brain.screen.print("Auto running")
         self.fingercallback(False)
         self.move_forward(-36,True)
         wait(0.5,SECONDS)
@@ -92,6 +93,8 @@ class CycloneRobotCodeApp:
         self.Left.set_velocity(60,PERCENT)
         self.Right.set_velocity(60,PERCENT)
         self.move_forward(-30,True)
+        self.brain.screen.print("Auto took "+str(self.brain.timer.time(SECONDS))+" seconds.")
+        wait(5,SECONDS)
         self.brain.program_stop()
     def deadzonify(self,inputvalue):
         # Make the input zero if the absolute value
