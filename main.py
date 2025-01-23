@@ -92,7 +92,7 @@ class CycloneRobotCodeApp:
         self.Chain.stop()
         self.Left.set_velocity(100,PERCENT)
         self.Right.set_velocity(100,PERCENT)
-        self.turn_degrees(40 if self.VALUE_SIDE=="right" else -40, True)
+        self.turn_degrees(50 if self.VALUE_SIDE=="right" else -40, True)
         self.Left.set_velocity(60,PERCENT)
         self.Right.set_velocity(60,PERCENT)
         self.move_forward(-30,True)
