@@ -93,7 +93,7 @@ class CycloneRobotCodeApp:
         self.Left.set_velocity(60,PERCENT)
         self.Right.set_velocity(60,PERCENT)
         self.move_forward(-30,True)
-        self.brain.screen.print("Auto took "+str(self.brain.timer.time(SECONDS))+" seconds.")
+        self.controller_1.screen.print("Auto took "+str(self.brain.timer.time(SECONDS))+" seconds.")
         wait(5,SECONDS)
         self.brain.program_stop()
     def deadzonify(self,inputvalue):
