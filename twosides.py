@@ -9,6 +9,7 @@ def do(side):
     open("main.py","w").write(main)
     print("Left" if side=="l" else "Right","configured.")
 
+success=True
 winsound.Beep(500,500)
 do("l")
 print("Uploading left/slot 1")
@@ -18,6 +19,7 @@ if r==0:
     winsound.Beep(600,500)
 else:
     winsound.Beep(400,500)
+    success=False
 os.remove(".gitignored/Left.py")
 print("\n")
 do("r")
@@ -29,3 +31,5 @@ if r==0:
     winsound.Beep(600,500)
 else:
     winsound.Beep(400,500)
+    success=False
+exit(int(success))
