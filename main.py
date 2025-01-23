@@ -75,6 +75,7 @@ class CycloneRobotCodeApp:
         self.brain.screen.print("Auto running")
         self.fingercallback(False)
         self.move_forward(-36,True)
+        wait(1,SECONDS)
         self.fingercallback(True)
         #move_forward(2)
         self.Chain.set_velocity(100,PERCENT)
@@ -88,7 +89,10 @@ class CycloneRobotCodeApp:
         self.Left.set_velocity(100,PERCENT)
         self.Right.set_velocity(100,PERCENT)
         self.turn_degrees(75 if self.VALUE_SIDE=="right" else -40, True)
+        self.Left.set_velocity(60,PERCENT)
+        self.Right.set_velocity(60,PERCENT)
         self.move_forward(-30,True)
+        self.brain.program_stop()
     def deadzonify(self,inputvalue):
         # Make the input zero if the absolute value
         # is less than the deadzone.
