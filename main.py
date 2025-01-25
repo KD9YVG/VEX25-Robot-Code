@@ -12,12 +12,14 @@ def play_vexcode_sound(sound_name):
     wait(5, MSEC)
 
 class CycloneRobotState:
-    def __init__(self) -> None:
+    def __init__(self,robotobject) -> None:
+        self.robotobject=robotobject
         self.isTimerRunning=False
         self.isFingerDown=True
         self.extramotoron=False
         self.changedIsTimerRunning=False
         self.timerdisplay=0.0
+        self.allowedfasttime=self.robotobject.brain.timer.system()
 class CycloneRobotCodeApp:
     def __init__(self) -> None:
         self.brain=Brain()
@@ -34,7 +36,7 @@ class CycloneRobotCodeApp:
         # clear the console to make sure we don't have the REPL in the console
         print("\033[2J")
         self.initialize_constants()
-        self.state=CycloneRobotState()
+        self.state=CycloneRobotState(self)
     def initialize_constants(self):
         self.JOYSTICK_DRIVE=self.controller_1.axis3
         self.JOYSTICK_TURN=self.controller_1.axis1
@@ -97,8 +99,8 @@ class CycloneRobotCodeApp:
         self.Right.set_velocity(30,PERCENT)
         self.move_forward(-30,True)
         self.controller_1.screen.print("Auto took "+str(self.brain.timer.time(SECONDS))+" seconds.")
-        wait(5,SECONDS)
-        self.brain.program_stop()
+        #wait(5,SECONDS)
+        #self.brain.program_stop()
     def deadzonify(self,inputvalue):
         # Make the input zero if the absolute value
         # is less than the deadzone.
@@ -220,6 +222,11 @@ class CycloneRobotCodeApp:
         drive_speed_multiplier=self.VALUE_MULTIPLIER_DRIVE
         # Position of the axis, taking deadzone into account
         axis_position=self.deadzonify(self.JOYSTICK_DRIVE.position())
+        if not axis_position>50:
+            self.state.allowedfasttime=self.brain.timer.system()+500
+        if self.brain.timer.system()<self.state.allowedfasttime:
+            if axis_position>50:
+                axis_position=50
         # Make the axis inverted, to fix an inverted driving issue we had
         updownpos=drive_speed_multiplier*(0-axis_position)
 
