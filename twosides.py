@@ -32,4 +32,4 @@ if r==0:
 else:
     winsound.Beep(400,500)
     success=False
-exit(int(success))
+exit(int(not success))
