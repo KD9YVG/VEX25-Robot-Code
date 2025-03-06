@@ -1,13 +1,13 @@
 {
 	"project": {
-		"name": "Right",
-		"slot": 2,
+		"name": "Skills auto",
+		"slot": 3,
 		"description": "",
 		"platform": "V5",
 		"creationDate": "Tue, 07 Jan 2025 01:48:05 GMT",
 		"language": "python",
 		"python": {
-			"main": "main.py"
+			"main": "skillsauto.py"
 		},
 		"sdkVersion": "V5_1_0_1_25"
 	},
