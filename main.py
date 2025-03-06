@@ -76,7 +76,7 @@ class CycloneRobotCodeApp:
         self.fingercallback()
         #self.brain.screen.print("Auto running")
         self.fingercallback(False)
-        self.move_forward(-16,True)
+        self.move_forward(-12,True)
         self.Left.set_velocity(30,PERCENT)
         self.Right.set_velocity(30,PERCENT)
         self.move_forward(-20,True)
