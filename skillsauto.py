@@ -76,8 +76,12 @@ class CycloneRobotCodeApp:
         self.Right.set_velocity(50,PERCENT)
         self.Left.spin(REVERSE)
         self.Right.spin(REVERSE)
-        while not self.controller_1.buttonDown.pressing():
-            wait(5,MSEC)
+        wait(4,SEC)
+        self.Left.set_velocity(50,PERCENT)
+        self.Right.set_velocity(50,PERCENT)
+        self.Left.spin(FORWARD)
+        self.Right.spin(FORWARD)
+        wait(1,SEC)
         self.Left.stop()
         self.Right.stop()
     def deadzonify(self,inputvalue):
