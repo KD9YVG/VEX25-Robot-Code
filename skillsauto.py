@@ -73,7 +73,7 @@ class CycloneRobotCodeApp:
         #self.move_forward(n,True)
         self.turn_degrees(-135,True)
         self.Left.set_velocity(70,PERCENT)
-        self.Right.set_velocity(50,PERCENT)
+        self.Right.set_velocity(65,PERCENT)
         self.Left.spin(REVERSE)
         self.Right.spin(REVERSE)
         while not self.controller_1.buttonDown.pressing():
