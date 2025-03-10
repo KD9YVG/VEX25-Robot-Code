@@ -71,7 +71,7 @@ class CycloneRobotCodeApp:
         self.Left.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=wait)
     def autonomous(self):
         #self.move_forward(n,True)
-        self.turn_degrees(135)
+        self.turn_degrees(-135)
         self.Left.set_velocity(70,PERCENT)
         self.Right.set_velocity(50,PERCENT)
         while not self.controller_1.buttonDown.pressing():
