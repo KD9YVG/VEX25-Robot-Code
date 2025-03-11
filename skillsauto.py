@@ -89,7 +89,7 @@ class CycloneRobotCodeApp:
         self.move_forward(-15,True)
         self.turn_degrees(90,True)
         self.move_forward(-15,True)
-        self.turn_degrees(40,True)
+        self.turn_degrees(45,True)
         self.Left.set_velocity(57,PERCENT)
         self.Right.set_velocity(50,PERCENT)
         self.Left.spin(FORWARD)
