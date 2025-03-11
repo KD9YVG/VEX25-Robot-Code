@@ -91,7 +91,7 @@ class CycloneRobotCodeApp:
         self.Right.set_velocity(50,PERCENT)
         self.Left.spin(FORWARD)
         self.Right.spin(FORWARD)
-        wait(3,SECONDS)
+        wait(2,SECONDS)
         self.Left.set_velocity(50,PERCENT)
         self.Right.set_velocity(50,PERCENT)
         self.Left.spin(REVERSE)
