@@ -71,9 +71,9 @@ class CycloneRobotCodeApp:
         self.Left.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=wait)
     def autonomous(self):
         self.move_forward(-9,True)
-        self.turn_degrees(90,True)
+        self.turn_degrees(-90,True)
         self.move_forward(-9,True)
-        self.turn_degrees(45,True)
+        self.turn_degrees(-45,True)
         self.Left.set_velocity(53,PERCENT)
         self.Right.set_velocity(50,PERCENT)
         self.Left.spin(FORWARD)
