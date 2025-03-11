@@ -86,7 +86,7 @@ class CycloneRobotCodeApp:
         wait(3,SECONDS)
         self.Left.set_velocity(50,PERCENT)
         self.turn_degrees(90,True)
-        self.move_forward(-8,True)
+        self.move_forward(-15,True)
         self.turn_degrees(90,True)
         self.move_forward(-15,True)
         self.turn_degrees(40,True)
