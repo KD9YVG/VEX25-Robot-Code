@@ -68,7 +68,7 @@ class CycloneRobotCodeApp:
         self.turn_degrees(-60,True)
         self.move_forward(-40,True)
         self.move_forward(30,True)
-        self.turn_degrees(-120,True)
+        self.turn_degrees(-100,True)
         self.move_forward(-100,True)
     def unusedfunction_imtoolazytocomment(self):
         self.Left.set_velocity(50,PERCENT)
