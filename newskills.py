@@ -81,6 +81,8 @@ class CycloneRobotCodeApp:
         self.Chain.spin(REVERSE)
         wait(5,SECONDS)
         self.Chain.stop()
+        self.move_forward(5,True)
+        self.move_forward(-5,True)
         self.fingercallback()
         self.turn_degrees(-40,True)
         self.Left.set_velocity(69,PERCENT)
