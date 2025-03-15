@@ -138,7 +138,7 @@ class CycloneRobotCodeApp:
         self.controller_1.screen.set_cursor(1,1)
         self.controller_1.screen.print("Please wait")
     def driver_control(self):
-        self.Finger.set_position(self.VALUE_FINGER_POSITION)
+        self.Finger.set_position(self.VALUE_FINGER_POSITION,TURNS)
         self.state.isFingerDown=False
         # Clear the screen and tell the user
         # how to start the timer.
