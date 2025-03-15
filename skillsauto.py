@@ -55,7 +55,11 @@ class CycloneRobotCodeApp:
     def autonomous(self):
         self.move_forward(-9,True)
         self.turn_degrees(-90,True)
+        self.fingercallback(False)
         self.move_forward(-15,True)
+        self.fingercallback(True)
+        self.Chain.set_velocity(100,PERCENT)
+        self.Chain.spin(FORWARD)
         self.turn_degrees(-40,True)
         self.Left.set_velocity(53,PERCENT)
         self.Right.set_velocity(50,PERCENT)
