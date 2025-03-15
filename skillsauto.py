@@ -72,6 +72,8 @@ class CycloneRobotCodeApp:
         wait(2.67,SECONDS)
         self.Left.stop()
         self.Right.stop()
+        self.fingercallback()
+        self.move_forward(20,True)
     def unusedfunction_imtoolazytocomment(self):
         self.move_forward(15,True)
         self.turn_degrees(-60,True)
