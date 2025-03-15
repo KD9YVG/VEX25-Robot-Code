@@ -83,7 +83,7 @@ class CycloneRobotCodeApp:
         wait(0.5,SECONDS)
         self.fingercallback(True)
         #move_forward(2)
-        self.Chain.set_velocity(50,PERCENT)
+        self.Chain.set_velocity(75,PERCENT)
         self.Chain.spin(REVERSE)
         wait(6, SECONDS)
         self.Chain.set_velocity(100,PERCENT)
