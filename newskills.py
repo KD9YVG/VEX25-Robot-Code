@@ -81,6 +81,7 @@ class CycloneRobotCodeApp:
         self.Chain.spin(REVERSE)
         wait(5,SECONDS)
         self.Chain.stop()
+        self.fingercallback()
         self.turn_degrees(-40,True)
         self.Left.set_velocity(63,PERCENT)
         self.Right.set_velocity(60,PERCENT)
@@ -89,7 +90,6 @@ class CycloneRobotCodeApp:
         wait(2.67,SECONDS)
         self.Left.stop()
         self.Right.stop()
-        self.fingercallback()
         self.move_forward(20,True)
     def deadzonify(self,inputvalue):
         # Make the input zero if the absolute value
