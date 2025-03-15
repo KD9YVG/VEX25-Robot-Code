@@ -15,7 +15,7 @@ def play_vexcode_sound(sound_name):
 class CycloneRobotState:
     def __init__(self) -> None:
         self.isTimerRunning=False
-        self.isFingerDown=False
+        self.isFingerDown=True
         self.extramotoron=False
         self.changedIsTimerRunning=False
         self.timerdisplay=0.0
@@ -138,6 +138,8 @@ class CycloneRobotCodeApp:
         self.controller_1.screen.set_cursor(1,1)
         self.controller_1.screen.print("Please wait")
     def driver_control(self):
+        self.Finger.set_position(self.VALUE_FINGER_POSITION)
+        self.state.isFingerDown=False
         # Clear the screen and tell the user
         # how to start the timer.
         self.timerpressed()
