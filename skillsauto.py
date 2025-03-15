@@ -53,7 +53,7 @@ class CycloneRobotCodeApp:
         self.Right.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=False)
         self.Left.spin_to_position(0-(inches+1)/(4*pi),TURNS,wait=wait)
     def autonomous(self):
-        self.fingercallback(True)
+        self.fingercallback(False)
         self.move_forward(-9,True)
         self.turn_degrees(-90,True)
         self.move_forward(-5,True)
@@ -62,6 +62,8 @@ class CycloneRobotCodeApp:
         self.fingercallback(False)
         self.Chain.set_velocity(100,PERCENT)
         self.Chain.spin(REVERSE)
+        wait(5,SECONDS)
+        self.Chain.stop()
         self.turn_degrees(-40,True)
         self.Left.set_velocity(53,PERCENT)
         self.Right.set_velocity(50,PERCENT)
